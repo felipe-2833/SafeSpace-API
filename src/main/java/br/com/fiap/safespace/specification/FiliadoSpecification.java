@@ -6,11 +6,11 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import br.com.fiap.safespace.controller.VoluntarioController.VoluntarioFilter;
-import br.com.fiap.safespace.model.Voluntario;
+import br.com.fiap.safespace.model.Filiado;
 import jakarta.persistence.criteria.Predicate;
 
-public class VoluntarioSpecification {
-     public static Specification<Voluntario> withFilters(VoluntarioFilter filter) {
+public class FiliadoSpecification {
+    public static Specification<Filiado> withFilters(VoluntarioFilter filter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

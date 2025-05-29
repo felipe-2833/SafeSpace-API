@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.safespace.model.Psicologo;
 import br.com.fiap.safespace.repository.PsicologoRepository;
+import br.com.fiap.safespace.specification.PsicologoSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -45,10 +46,11 @@ public class PsicologoController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar psicologos", tags = "psicologos", summary = "Lista de psicologos")
-    public Page<Psicologo> index(
+    public Page<Psicologo> index(PsicologoFilter filter,
         @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando psicologos");
-        return repository.findAll(pageable);
+        var specification = PsicologoSpecification.withFilters(filter);
+        return repository.findAll(specification, pageable);
     }
 
     @PostMapping

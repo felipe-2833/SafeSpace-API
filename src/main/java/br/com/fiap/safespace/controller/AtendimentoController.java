@@ -26,6 +26,7 @@ import br.com.fiap.safespace.model.Atendimento;
 import br.com.fiap.safespace.model.Statustype;
 import br.com.fiap.safespace.model.AtendimentoType;
 import br.com.fiap.safespace.repository.AtendimentoRepository;
+import br.com.fiap.safespace.specification.AtendimentoSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -49,10 +50,11 @@ public class AtendimentoController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar atendimentos", tags = "atendimentos", summary = "Lista de atendimentos")
-    public Page<Atendimento> index(
+    public Page<Atendimento> index(AtendimentoFilter filter,
         @ParameterObject @PageableDefault(sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando atendimentos");
-        return repository.findAll(pageable);
+        var specification = AtendimentoSpecification.withFilters(filter);
+        return repository.findAll(specification, pageable);
     }
 
     @PostMapping

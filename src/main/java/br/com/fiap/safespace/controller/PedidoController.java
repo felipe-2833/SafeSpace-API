@@ -26,6 +26,7 @@ import br.com.fiap.safespace.model.Pedido;
 import br.com.fiap.safespace.model.Statustype;
 import br.com.fiap.safespace.model.PedidoType;
 import br.com.fiap.safespace.repository.PedidoRepository;
+import br.com.fiap.safespace.specification.PedidoSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -49,10 +50,11 @@ public class PedidoController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar pedidos", tags = "pedidos", summary = "Lista de pedidos")
-    public Page<Pedido> index(
+    public Page<Pedido> index(PedidoFilter filter,
         @ParameterObject @PageableDefault(sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando pedidos");
-        return repository.findAll(pageable);
+        var specification = PedidoSpecification.withFilters(filter);
+        return repository.findAll(specification, pageable);
     }
 
     @PostMapping

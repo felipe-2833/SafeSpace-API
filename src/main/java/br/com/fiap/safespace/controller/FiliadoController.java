@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import br.com.fiap.safespace.controller.VoluntarioController.VoluntarioFilter;
 import br.com.fiap.safespace.model.Filiado;
 import br.com.fiap.safespace.repository.FiliadoRepository;
+import br.com.fiap.safespace.specification.FiliadoSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -42,10 +44,11 @@ public class FiliadoController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar filiados", tags = "filiados", summary = "Lista de filiados")
-    public Page<Filiado> index(
+    public Page<Filiado> index(VoluntarioFilter filter,
         @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando filiados");
-        return repository.findAll(pageable);
+        var specification = FiliadoSpecification.withFilters(filter);
+        return repository.findAll(specification, pageable);
     }
 
     @PostMapping

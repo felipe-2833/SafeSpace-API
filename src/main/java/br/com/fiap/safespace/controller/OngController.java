@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.safespace.model.Ong;
 import br.com.fiap.safespace.repository.OngRepository;
+import br.com.fiap.safespace.specification.OngSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -45,10 +46,11 @@ public class OngController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar ongs", tags = "ongs", summary = "Lista de ongs")
-    public Page<Ong> index(
+    public Page<Ong> index(OngFilter filter,
         @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando ongs");
-        return repository.findAll(pageable);
+        var specification = OngSpecification.withFilters(filter);
+        return repository.findAll(specification, pageable);
     }
 
     @PostMapping

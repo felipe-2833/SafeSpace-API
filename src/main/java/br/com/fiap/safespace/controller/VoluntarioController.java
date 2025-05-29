@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.safespace.model.Voluntario;
 import br.com.fiap.safespace.repository.VoluntarioRepository;
+import br.com.fiap.safespace.specification.VoluntarioSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -46,10 +47,11 @@ public class VoluntarioController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar voluntarios", tags = "voluntarios", summary = "Lista de voluntarios")
-    public Page<Voluntario> index(
+    public Page<Voluntario> index(VoluntarioFilter filter,
         @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando voluntarios");
-        return repository.findAll(pageable);
+        var specification = VoluntarioSpecification.withFilters(filter);
+        return repository.findAll(specification, pageable);
     }
 
     @PostMapping
