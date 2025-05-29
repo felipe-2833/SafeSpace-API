@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.safespace.model.Psicologo;
-import br.com.fiap.safespace.model.UserRole;
 import br.com.fiap.safespace.repository.PsicologoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PsicologoController {
 
-    public record PsicologoFilter(String nome, String endereco, UserRole role, String crp, String area_atuacao) {
+    public record PsicologoFilter(String nome, String endereco, String crp, String area_atuacao) {
     }
 
     @Autowired

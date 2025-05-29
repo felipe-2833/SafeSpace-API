@@ -22,9 +22,6 @@ public class PsicologoSpecification {
                 predicates.add(cb.like(cb.lower(root.get("endereco")), "%" + filter.endereco().toLowerCase() + "%"));
             }
 
-            if (filter.role() != null) {
-                predicates.add(cb.equal(root.get("role"), filter.role()));
-            }
 
             if (filter.crp() != null && !filter.crp().isBlank()) {
                 predicates.add(cb.like(cb.lower(root.get("crp")), "%" + filter.crp().toLowerCase() + "%"));

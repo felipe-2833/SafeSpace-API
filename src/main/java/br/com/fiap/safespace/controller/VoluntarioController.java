@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import br.com.fiap.safespace.model.UserRole;
 import br.com.fiap.safespace.model.Voluntario;
 import br.com.fiap.safespace.repository.VoluntarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class VoluntarioController {
 
-    public record VoluntarioFilter(String nome, String endereco, UserRole role, String disponibilidade, String area_atuacao) {
+    public record VoluntarioFilter(String nome, String endereco, String disponibilidade, String area_atuacao) {
     }
 
     @Autowired

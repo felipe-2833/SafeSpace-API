@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,4 +28,9 @@ public class Filiado extends Voluntario{
     @ManyToOne
     @JsonIgnore
     private Ong ong;
+
+    @PrePersist
+    public void setRoleAsFiliado() {
+        this.setRole(UserRole.FILIADO);
+    }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,5 +28,10 @@ public class Voluntario extends User{
 
     @NotBlank(message = "campo obrigatório")
     private String area_atuacao;
+
+    @PrePersist
+    public void setRoleAsVoluntario() {
+        this.setRole(UserRole.VOLUNTARIO);
+    }
 
 }
