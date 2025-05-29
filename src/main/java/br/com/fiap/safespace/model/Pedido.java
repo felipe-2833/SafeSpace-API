@@ -46,6 +46,6 @@ public class Pedido {
 
     @NotNull(message = "campo obrigatório")
     @Enumerated(EnumType.STRING)
-    private TipoPedido tipoPedido;
+    private PedidoType tipoPedido;
 
 }

@@ -31,77 +31,81 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/ongs")
 @Slf4j
 public class OngController {
+
+    public record OngFilter(String nome, String telefone, String endereco) {
+    }
+
     @Autowired
-        private OngRepository repository;
+    private OngRepository repository;
 
-        @GetMapping
-        @Cacheable("ongs")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @GetMapping
+    @Cacheable("ongs")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar ongs", tags = "ongs", summary = "Lista de ongs")
-        public Page<Ong> index(
-            @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
-            log.info("Buscando ongs");
-            return repository.findAll(pageable);
-        }
+    public Page<Ong> index(
+        @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
+        log.info("Buscando ongs");
+        return repository.findAll(pageable);
+    }
 
-        @PostMapping
-        @CacheEvict(value = "ongs", allEntries = true)
-        @ResponseStatus(HttpStatus.CREATED)
-        @Operation(responses = {
-                @ApiResponse(responseCode = "400", description = "Falha na validação")
-        }, description = "Cadastrar ong", tags = "ongs", summary = "Cadastrar ong")
-        public Ong create(@RequestBody @Valid Ong ong) {
-            log.info("Cadastrando ong do" + ong.getNome());
-            return repository.save(ong);
-        }
+    @PostMapping
+    @CacheEvict(value = "ongs", allEntries = true)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(responses = {
+            @ApiResponse(responseCode = "400", description = "Falha na validação")
+    }, description = "Cadastrar ong", tags = "ongs", summary = "Cadastrar ong")
+    public Ong create(@RequestBody @Valid Ong ong) {
+        log.info("Cadastrando ong do" + ong.getNome());
+        return repository.save(ong);
+    }
 
-        @GetMapping("{id_ong}")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "ID inválido"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @GetMapping("{id_ong}")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar ong pelo id", tags = "ongs", summary = "Listar ong pelo id")
-        public Ong get(@PathVariable Long id_ong) {
-            log.info("Buscando ong " + id_ong);
-            return getOng(id_ong);
-        }
+    public Ong get(@PathVariable Long id_ong) {
+        log.info("Buscando ong " + id_ong);
+        return getOng(id_ong);
+    }
 
-        @DeleteMapping("{id_ong}")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
-            @ApiResponse(responseCode = "400", description = "ID inválido"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @DeleteMapping("{id_ong}")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar ong pelo id", tags = "ongs", summary = "Deletar ong")
-        @ResponseStatus(HttpStatus.NO_CONTENT)
-        public void destroy(@PathVariable Long id_ong) {
-            log.info("Apagando ong " + id_ong);
-            repository.delete(getOng(id_ong));
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void destroy(@PathVariable Long id_ong) {
+        log.info("Apagando ong " + id_ong);
+        repository.delete(getOng(id_ong));
+    }
 
-        @PutMapping("{id_ong}")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @PutMapping("{id_ong}")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update ong pelo id", tags = "ongs", summary = "Update ong pelo id")
-        public Ong update(@PathVariable Long id_ong, @RequestBody @Valid Ong ong) {
-            log.info("Atualizando ong " + id_ong + " " + ong);
-            getOng(id_ong);
-            ong.setId_ong(id_ong);
-            return repository.save(ong);
-        }
+    public Ong update(@PathVariable Long id_ong, @RequestBody @Valid Ong ong) {
+        log.info("Atualizando ong " + id_ong + " " + ong);
+        getOng(id_ong);
+        ong.setId_ong(id_ong);
+        return repository.save(ong);
+    }
 
-        private Ong getOng(Long id_ong) {
-            return repository.findById(id_ong)
-                    .orElseThrow(
-                            () -> new ResponseStatusException(
-                                    HttpStatus.NOT_FOUND,
-                                    "ong não encontrada"));
-        }
+    private Ong getOng(Long id_ong) {
+        return repository.findById(id_ong)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "ong não encontrada"));
+    }
 }

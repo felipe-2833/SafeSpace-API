@@ -1,5 +1,7 @@
 package br.com.fiap.safespace.controller;
 
+import java.time.LocalDateTime;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.safespace.model.Atendimento;
+import br.com.fiap.safespace.model.Statustype;
+import br.com.fiap.safespace.model.AtendimentoType;
 import br.com.fiap.safespace.repository.AtendimentoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,77 +35,81 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/atendimentos")
 @Slf4j
 public class AtendimentoController {
+
+    public record AtendimentoFilter(LocalDateTime startDate, LocalDateTime endDate, String relatorio, Statustype status, AtendimentoType atendimentoType) {
+    }
+
     @Autowired
-        private AtendimentoRepository repository;
+    private AtendimentoRepository repository;
 
-        @GetMapping
-        @Cacheable("atendimentos")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @GetMapping
+    @Cacheable("atendimentos")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar atendimentos", tags = "atendimentos", summary = "Lista de atendimentos")
-        public Page<Atendimento> index(
-            @ParameterObject @PageableDefault(sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
-            log.info("Buscando atendimentos");
-            return repository.findAll(pageable);
-        }
+    public Page<Atendimento> index(
+        @ParameterObject @PageableDefault(sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
+        log.info("Buscando atendimentos");
+        return repository.findAll(pageable);
+    }
 
-        @PostMapping
-        @CacheEvict(value = "atendimentos", allEntries = true)
-        @ResponseStatus(HttpStatus.CREATED)
-        @Operation(responses = {
-                @ApiResponse(responseCode = "400", description = "Falha na validação")
-        }, description = "Cadastrar atendimento", tags = "atendimentos", summary = "Cadastrar atendimento")
-        public Atendimento create(@RequestBody @Valid Atendimento atendimento) {
-            log.info("Cadastrando atendimento do" + atendimento.getUser().getNome());
-            return repository.save(atendimento);
-        }
+    @PostMapping
+    @CacheEvict(value = "atendimentos", allEntries = true)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(responses = {
+            @ApiResponse(responseCode = "400", description = "Falha na validação")
+    }, description = "Cadastrar atendimento", tags = "atendimentos", summary = "Cadastrar atendimento")
+    public Atendimento create(@RequestBody @Valid Atendimento atendimento) {
+        log.info("Cadastrando atendimento do" + atendimento.getUser().getNome());
+        return repository.save(atendimento);
+    }
 
-        @GetMapping("{id_atendimento}")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "ID inválido"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @GetMapping("{id_atendimento}")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar atendimento pelo id", tags = "atendimentos", summary = "Listar atendimento pelo id")
-        public Atendimento get(@PathVariable Long id_atendimento) {
-            log.info("Buscando atendimento " + id_atendimento);
-            return getAtendimento(id_atendimento);
-        }
+    public Atendimento get(@PathVariable Long id_atendimento) {
+        log.info("Buscando atendimento " + id_atendimento);
+        return getAtendimento(id_atendimento);
+    }
 
-        @DeleteMapping("{id_atendimento}")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
-            @ApiResponse(responseCode = "400", description = "ID inválido"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @DeleteMapping("{id_atendimento}")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar atendimento pelo id", tags = "atendimentos", summary = "Deletar atendimento")
-        @ResponseStatus(HttpStatus.NO_CONTENT)
-        public void destroy(@PathVariable Long id_atendimento) {
-            log.info("Apagando atendimento " + id_atendimento);
-            repository.delete(getAtendimento(id_atendimento));
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void destroy(@PathVariable Long id_atendimento) {
+        log.info("Apagando atendimento " + id_atendimento);
+        repository.delete(getAtendimento(id_atendimento));
+    }
 
-        @PutMapping("{id_atendimento}")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @PutMapping("{id_atendimento}")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update atendimento pelo id", tags = "atendimentos", summary = "Update atendimento pelo id")
-        public Atendimento update(@PathVariable long id_atendimento, @RequestBody @Valid Atendimento atendimento) {
-            log.info("Atualizando atendimento " + id_atendimento + " " + atendimento);
-            getAtendimento(id_atendimento);
-            atendimento.setId_atendimento(id_atendimento);
-            return repository.save(atendimento);
-        }
+    public Atendimento update(@PathVariable long id_atendimento, @RequestBody @Valid Atendimento atendimento) {
+        log.info("Atualizando atendimento " + id_atendimento + " " + atendimento);
+        getAtendimento(id_atendimento);
+        atendimento.setId_atendimento(id_atendimento);
+        return repository.save(atendimento);
+    }
 
-        private Atendimento getAtendimento(Long id_atendimento) {
-            return repository.findById(id_atendimento)
-                    .orElseThrow(
-                            () -> new ResponseStatusException(
-                                    HttpStatus.NOT_FOUND,
-                                    "atendimento não encontrada"));
-        }
+    private Atendimento getAtendimento(Long id_atendimento) {
+        return repository.findById(id_atendimento)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "atendimento não encontrada"));
+    }
 }

@@ -1,6 +1,6 @@
 package br.com.fiap.safespace.model;
 
-public enum TipoAtendimento {
+public enum AtendimentoType {
     PSICOLOGICO_EMERGENCIAL,
     APOIO_EMOCIONAL,
     TRIAGEM_INICIAL,

@@ -31,77 +31,78 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/filiados")
 @Slf4j
 public class FiliadoController {
+
     @Autowired
-        private FiliadoRepository repository;
+    private FiliadoRepository repository;
 
-        @GetMapping
-        @Cacheable("filiados")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @GetMapping
+    @Cacheable("filiados")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar filiados", tags = "filiados", summary = "Lista de filiados")
-        public Page<Filiado> index(
-            @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
-            log.info("Buscando filiados");
-            return repository.findAll(pageable);
-        }
+    public Page<Filiado> index(
+        @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
+        log.info("Buscando filiados");
+        return repository.findAll(pageable);
+    }
 
-        @PostMapping
-        @CacheEvict(value = "filiados", allEntries = true)
-        @ResponseStatus(HttpStatus.CREATED)
-        @Operation(responses = {
-                @ApiResponse(responseCode = "400", description = "Falha na validação")
-        }, description = "Cadastrar filiado", tags = "filiados", summary = "Cadastrar filiado")
-        public Filiado create(@RequestBody @Valid Filiado filiado) {
-            log.info("Cadastrando filiado do" + filiado.getNome());
-            return repository.save(filiado);
-        }
+    @PostMapping
+    @CacheEvict(value = "filiados", allEntries = true)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(responses = {
+            @ApiResponse(responseCode = "400", description = "Falha na validação")
+    }, description = "Cadastrar filiado", tags = "filiados", summary = "Cadastrar filiado")
+    public Filiado create(@RequestBody @Valid Filiado filiado) {
+        log.info("Cadastrando filiado do" + filiado.getNome());
+        return repository.save(filiado);
+    }
 
-        @GetMapping("{id_filiado}")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "ID inválido"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @GetMapping("{id_filiado}")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar filiado pelo id", tags = "filiados", summary = "Listar filiado pelo id")
-        public Filiado get(@PathVariable Long id_filiado) {
-            log.info("Buscando filiado " + id_filiado);
-            return getFiliado(id_filiado);
-        }
+    public Filiado get(@PathVariable Long id_filiado) {
+        log.info("Buscando filiado " + id_filiado);
+        return getFiliado(id_filiado);
+    }
 
-        @DeleteMapping("{id_filiado}")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
-            @ApiResponse(responseCode = "400", description = "ID inválido"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @DeleteMapping("{id_filiado}")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar filiado pelo id", tags = "filiados", summary = "Deletar filiado")
-        @ResponseStatus(HttpStatus.NO_CONTENT)
-        public void destroy(@PathVariable Long id_filiado) {
-            log.info("Apagando filiado " + id_filiado);
-            repository.delete(getFiliado(id_filiado));
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void destroy(@PathVariable Long id_filiado) {
+        log.info("Apagando filiado " + id_filiado);
+        repository.delete(getFiliado(id_filiado));
+    }
 
-        @PutMapping("{id_filiado}")
-        @Operation(responses = {
-            @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @PutMapping("{id_filiado}")
+    @Operation(responses = {
+        @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update filiado pelo id", tags = "filiados", summary = "Update filiado pelo id")
-        public Filiado update(@PathVariable long id_filiado, @RequestBody @Valid Filiado filiado) {
-            log.info("Atualizando filiado " + id_filiado + " " + filiado);
-            getFiliado(id_filiado);
-            filiado.setId_filiado(id_filiado);
-            return repository.save(filiado);
-        }
+    public Filiado update(@PathVariable long id_filiado, @RequestBody @Valid Filiado filiado) {
+        log.info("Atualizando filiado " + id_filiado + " " + filiado);
+        getFiliado(id_filiado);
+        filiado.setId_filiado(id_filiado);
+        return repository.save(filiado);
+    }
 
-        private Filiado getFiliado(Long id_filiado) {
-            return repository.findById(id_filiado)
-                    .orElseThrow(
-                            () -> new ResponseStatusException(
-                                    HttpStatus.NOT_FOUND,
-                                    "filiado não encontrada"));
-        }
+    private Filiado getFiliado(Long id_filiado) {
+        return repository.findById(id_filiado)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "filiado não encontrada"));
+    }
 }

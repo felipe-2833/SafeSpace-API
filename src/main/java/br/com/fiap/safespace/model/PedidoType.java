@@ -1,6 +1,6 @@
 package br.com.fiap.safespace.model;
 
-public enum TipoPedido {
+public enum PedidoType {
     ABRIGO,
     ALIMENTACAO,
     TRANSPORTE,

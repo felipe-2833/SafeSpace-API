@@ -42,7 +42,7 @@ public class Atendimento {
 
     @NotNull(message = "campo obrigatório")
     @Enumerated(EnumType.STRING)
-    private TipoAtendimento tipoAtendimento;
+    private AtendimentoType tipoAtendimento;
 
     @NotNull(message = "campo obrigatório")
     @ManyToOne
