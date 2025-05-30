@@ -20,9 +20,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Psicologo extends User{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_psicologo;
 
     @NotBlank(message = "campo obrigatório")
     @Size(min = 6)

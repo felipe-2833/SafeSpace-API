@@ -20,11 +20,11 @@ public class AtendimentoSpecification {
             
             if (filter.startDate() != null && filter.endDate() != null) {
                 predicates.add(
-                        cb.between(root.get("data_cadastro"), filter.startDate(), filter.endDate()));
+                        cb.between(root.get("dataHora"), filter.startDate(), filter.endDate()));
             }
 
             if (filter.startDate() != null && filter.endDate() == null) {
-                predicates.add(cb.equal(root.get("data_cadastro"), filter.startDate()));
+                predicates.add(cb.equal(root.get("dataHora"), filter.startDate()));
             }
 
             if (filter.status() != null) {

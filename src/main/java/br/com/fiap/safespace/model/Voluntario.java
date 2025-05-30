@@ -19,9 +19,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Voluntario extends User{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_voluntario;
 
     @NotBlank(message = "campo obrigatório")
     private String disponibilidade;

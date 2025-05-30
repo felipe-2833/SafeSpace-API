@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,12 +22,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Filiado extends Voluntario{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_filiado;
 
+    @NotNull(message = "campo obrigatório")
     @ManyToOne
-    @JsonIgnore
     private Ong ong;
 
     @PrePersist

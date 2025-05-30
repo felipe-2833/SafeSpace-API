@@ -30,13 +30,26 @@ import jakarta.annotation.PostConstruct;
 
 @Component
 public class DataBaseSeeder {
-    @Autowired private UserRepository userRepository;
-    @Autowired private OngRepository ongRepository;
-    @Autowired private PsicologoRepository psicologoRepository;
-    @Autowired private VoluntarioRepository voluntarioRepository;
-    @Autowired private FiliadoRepository filiadoRepository;
-    @Autowired private PedidoRepository pedidoRepository;
-    @Autowired private AtendimentoRepository atendimentoRepository;
+    @Autowired 
+    private UserRepository userRepository;
+
+    @Autowired 
+    private OngRepository ongRepository;
+
+    @Autowired 
+    private PsicologoRepository psicologoRepository;
+
+    @Autowired 
+    private VoluntarioRepository voluntarioRepository;
+
+    @Autowired 
+    private FiliadoRepository filiadoRepository;
+
+    @Autowired 
+    private PedidoRepository pedidoRepository;
+    
+    @Autowired 
+    private AtendimentoRepository atendimentoRepository;
 
     @PostConstruct
     public void seed() {
@@ -126,7 +139,7 @@ public class DataBaseSeeder {
                 .dataSolicitacao(LocalDate.now().minusDays(i))
                 .status(Statustype.ATIVO)
                 .user(users.get(i))
-                .tipoPedido(PedidoType.ABRIGO)
+                .pedidoType(PedidoType.ABRIGO)
                 .build());
         }
         pedidoRepository.saveAll(pedidos);
@@ -137,8 +150,8 @@ public class DataBaseSeeder {
             atendimentos.add(Atendimento.builder()
                 .dataHora(LocalDateTime.now().minusHours(i * 5))
                 .status(Statustype.ATIVO)
-                .realtorio("Sessão de acolhimento " + i)
-                .tipoAtendimento(AtendimentoType.PSICOLOGICO_EMERGENCIAL)
+                .relatorio("Sessão de acolhimento " + i)
+                .atendimentoType(AtendimentoType.PSICOLOGICO_EMERGENCIAL)
                 .user(users.get(i))
                 .psicologo(psicologos.get(i))
                 .build());

@@ -1,5 +1,6 @@
 package br.com.fiap.safespace.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -30,7 +32,6 @@ public class Atendimento {
     private Long id_atendimento;
 
     @PastOrPresent(message = "não pode ser no futuro")
-    @JsonIgnore
     private LocalDateTime dataHora;
 
     @NotNull(message = "campo obrigatório")
@@ -38,11 +39,11 @@ public class Atendimento {
     private Statustype status;
 
     @NotBlank(message = "campo obrigatório")
-    private String realtorio;
+    private String relatorio;
 
     @NotNull(message = "campo obrigatório")
     @Enumerated(EnumType.STRING)
-    private AtendimentoType tipoAtendimento;
+    private AtendimentoType atendimentoType;
 
     @NotNull(message = "campo obrigatório")
     @ManyToOne

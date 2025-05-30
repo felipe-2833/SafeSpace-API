@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -33,7 +34,7 @@ public class Pedido {
     private String descricao;
 
     @PastOrPresent(message = "não pode ser no futuro")
-    @JsonIgnore
+    @NotNull(message = "campo obrigatório")
     private LocalDate dataSolicitacao;
 
     @NotNull(message = "campo obrigatório")
@@ -46,6 +47,11 @@ public class Pedido {
 
     @NotNull(message = "campo obrigatório")
     @Enumerated(EnumType.STRING)
-    private PedidoType tipoPedido;
+    private PedidoType pedidoType;
+
+    @PrePersist
+    public void setDataSolitacaoAsNow() {
+        this.setDataSolicitacao(LocalDate.now());
+    }
 
 }

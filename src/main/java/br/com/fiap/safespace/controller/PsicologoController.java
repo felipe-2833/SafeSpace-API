@@ -11,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,8 +47,8 @@ public class PsicologoController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar psicologos", tags = "psicologos", summary = "Lista de psicologos")
-    public Page<Psicologo> index(PsicologoFilter filter,
-        @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Page<Psicologo> index(@ParameterObject @ModelAttribute PsicologoFilter filter,
+        @ParameterObject @PageableDefault(size = 5, sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando psicologos");
         var specification = PsicologoSpecification.withFilters(filter);
         return repository.findAll(specification, pageable);
@@ -99,7 +100,7 @@ public class PsicologoController {
     public Psicologo update(@PathVariable Long id_psicologo, @RequestBody @Valid Psicologo psicologo) {
         log.info("Atualizando psicologo " + id_psicologo + " " + psicologo);
         getPsicologo(id_psicologo);
-        psicologo.setId_psicologo(id_psicologo);
+        psicologo.setId_user(id_psicologo);
         return repository.save(psicologo);
     }
 

@@ -11,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,8 +47,8 @@ public class OngController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar ongs", tags = "ongs", summary = "Lista de ongs")
-    public Page<Ong> index(OngFilter filter,
-        @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Page<Ong> index(@ParameterObject @ModelAttribute OngFilter filter,
+        @ParameterObject @PageableDefault(size = 5, sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando ongs");
         var specification = OngSpecification.withFilters(filter);
         return repository.findAll(specification, pageable);

@@ -11,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -44,8 +45,8 @@ public class FiliadoController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar filiados", tags = "filiados", summary = "Lista de filiados")
-    public Page<Filiado> index(VoluntarioFilter filter,
-        @ParameterObject @PageableDefault(sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Page<Filiado> index(@ParameterObject @ModelAttribute VoluntarioFilter filter,
+        @ParameterObject @PageableDefault(size = 5, sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando filiados");
         var specification = FiliadoSpecification.withFilters(filter);
         return repository.findAll(specification, pageable);
@@ -97,7 +98,7 @@ public class FiliadoController {
     public Filiado update(@PathVariable long id_filiado, @RequestBody @Valid Filiado filiado) {
         log.info("Atualizando filiado " + id_filiado + " " + filiado);
         getFiliado(id_filiado);
-        filiado.setId_filiado(id_filiado);
+        filiado.setId_user(id_filiado);
         return repository.save(filiado);
     }
 

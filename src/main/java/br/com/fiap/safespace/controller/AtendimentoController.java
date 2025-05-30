@@ -13,6 +13,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -50,8 +51,8 @@ public class AtendimentoController {
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar atendimentos", tags = "atendimentos", summary = "Lista de atendimentos")
-    public Page<Atendimento> index(AtendimentoFilter filter,
-        @ParameterObject @PageableDefault(sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Page<Atendimento> index(@ParameterObject @ModelAttribute AtendimentoFilter filter,
+        @ParameterObject @PageableDefault(size = 5, sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando atendimentos");
         var specification = AtendimentoSpecification.withFilters(filter);
         return repository.findAll(specification, pageable);
