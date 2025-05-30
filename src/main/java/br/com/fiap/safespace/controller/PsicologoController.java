@@ -45,6 +45,7 @@ public class PsicologoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar psicologos", tags = "psicologos", summary = "Lista de psicologos")
     public Page<Psicologo> index(@ParameterObject @ModelAttribute PsicologoFilter filter,
@@ -58,7 +59,8 @@ public class PsicologoController {
     @CacheEvict(value = "psicologos", allEntries = true)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(responses = {
-            @ApiResponse(responseCode = "400", description = "Falha na validação")
+            @ApiResponse(responseCode = "400", description = "Falha na validação"),
+            @ApiResponse(responseCode = "403", description = "Permissão negada")
     }, description = "Cadastrar psicologo", tags = "psicologos", summary = "Cadastrar psicologo")
     public Psicologo create(@RequestBody @Valid Psicologo psicologo) {
         log.info("Cadastrando psicologo " + psicologo.getNome());
@@ -69,6 +71,7 @@ public class PsicologoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar psicologo pelo id", tags = "psicologos", summary = "Listar psicologo pelo id")
@@ -81,6 +84,7 @@ public class PsicologoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar psicologo pelo id", tags = "psicologos", summary = "Deletar psicologo")
@@ -94,6 +98,7 @@ public class PsicologoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update psicologo pelo id", tags = "psicologos", summary = "Update psicologo pelo id")

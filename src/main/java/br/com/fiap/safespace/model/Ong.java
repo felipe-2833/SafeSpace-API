@@ -1,10 +1,13 @@
 package br.com.fiap.safespace.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -35,4 +38,8 @@ public class Ong {
 
     @NotBlank(message = "campo obrigartório")
     private String endereco;
+
+    @ManyToOne
+    @JsonIgnore
+    private User user;
 }

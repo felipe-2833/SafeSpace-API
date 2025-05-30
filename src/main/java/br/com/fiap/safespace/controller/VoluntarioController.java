@@ -46,6 +46,7 @@ public class VoluntarioController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar voluntarios", tags = "voluntarios", summary = "Lista de voluntarios")
     public Page<Voluntario> index(@ParameterObject @ModelAttribute VoluntarioFilter filter,
@@ -59,7 +60,8 @@ public class VoluntarioController {
     @CacheEvict(value = "voluntarios", allEntries = true)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(responses = {
-            @ApiResponse(responseCode = "400", description = "Falha na validação")
+            @ApiResponse(responseCode = "400", description = "Falha na validação"),
+            @ApiResponse(responseCode = "403", description = "Permissão negada")
     }, description = "Cadastrar voluntario", tags = "voluntarios", summary = "Cadastrar voluntario")
     public Voluntario create(@RequestBody @Valid Voluntario voluntario) {
         log.info("Cadastrando voluntario " + voluntario.getNome());
@@ -70,6 +72,7 @@ public class VoluntarioController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar voluntario pelo id", tags = "voluntarios", summary = "Listar voluntario pelo id")
@@ -82,6 +85,7 @@ public class VoluntarioController {
     @Operation(responses = {
         @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar voluntario pelo id", tags = "voluntarios", summary = "Deletar voluntario")
@@ -95,6 +99,7 @@ public class VoluntarioController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update voluntario pelo id", tags = "voluntarios", summary = "Update voluntario pelo id")

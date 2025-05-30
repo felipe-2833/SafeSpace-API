@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import br.com.fiap.safespace.model.Atendimento;
@@ -51,19 +52,23 @@ public class DataBaseSeeder {
     @Autowired 
     private AtendimentoRepository atendimentoRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostConstruct
     public void seed() {
 
         // USERS
         List<User> users = new ArrayList<>();
-        users.add(User.builder().nome("Admin").email("admin@safespace.com").password("12345").endereco("Rua Central, 0").role(UserRole.ADMIN).build());
-        users.add(User.builder().nome("Governador").email("gov@safespace.com").password("12345").endereco("Palácio, 1").role(UserRole.GOVERNO).build());
+        users.add(User.builder().nome("Admin").email("admin@safespace.com").password(passwordEncoder.encode("12345")).endereco("Rua Central, 0").role(UserRole.ADMIN).build());
+        users.add(User.builder().nome("user").email("user@safespace.com").password(passwordEncoder.encode("12345")).endereco("Rua Central, 1").role(UserRole.USER).build());
+        users.add(User.builder().nome("Governador").email("gov@safespace.com").password(passwordEncoder.encode("12345")).endereco("Palácio, 1").role(UserRole.GOVERNO).build());
 
         for (int i = 1; i <= 10; i++) {
             users.add(User.builder()
                 .nome("Usuário " + i)
                 .email("user" + i + "@safespace.com")
-                .password("12345")
+                .password(passwordEncoder.encode("12345"))
                 .endereco("Rua Exemplo, " + i)
                 .role(UserRole.VITIMA)
                 .build());

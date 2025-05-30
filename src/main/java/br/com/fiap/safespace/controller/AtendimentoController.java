@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,6 +26,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.safespace.model.Atendimento;
 import br.com.fiap.safespace.model.Statustype;
+import br.com.fiap.safespace.model.User;
+import br.com.fiap.safespace.model.UserRole;
 import br.com.fiap.safespace.model.AtendimentoType;
 import br.com.fiap.safespace.repository.AtendimentoRepository;
 import br.com.fiap.safespace.specification.AtendimentoSpecification;
@@ -49,23 +52,29 @@ public class AtendimentoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar atendimentos", tags = "atendimentos", summary = "Lista de atendimentos")
-    public Page<Atendimento> index(@ParameterObject @ModelAttribute AtendimentoFilter filter,
+    public Page<Atendimento> index(@AuthenticationPrincipal User user, @ParameterObject @ModelAttribute AtendimentoFilter filter,
         @ParameterObject @PageableDefault(size = 5, sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando atendimentos");
         var specification = AtendimentoSpecification.withFilters(filter);
-        return repository.findAll(specification, pageable);
+        return repository.findByUser(user ,specification, pageable);
     }
 
     @PostMapping
     @CacheEvict(value = "atendimentos", allEntries = true)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(responses = {
-            @ApiResponse(responseCode = "400", description = "Falha na validação")
+            @ApiResponse(responseCode = "400", description = "Falha na validação"),
+            @ApiResponse(responseCode = "403", description = "Permissão negada")
     }, description = "Cadastrar atendimento", tags = "atendimentos", summary = "Cadastrar atendimento")
-    public Atendimento create(@RequestBody @Valid Atendimento atendimento) {
+    public Atendimento create(@RequestBody @Valid Atendimento atendimento, @AuthenticationPrincipal User user) {
         log.info("Cadastrando atendimento do" + atendimento.getUser().getNome());
+        if (atendimento.getUser().getRole() != UserRole.USER || atendimento.getUser().getRole() != UserRole.VITIMA) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não é permitido fazer atendimentos em usuarios que não sejam padrões ou vitimas");
+        }
+        atendimento.setUser(user);
         return repository.save(atendimento);
     }
 
@@ -73,11 +82,13 @@ public class AtendimentoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar atendimento pelo id", tags = "atendimentos", summary = "Listar atendimento pelo id")
-    public Atendimento get(@PathVariable Long id_atendimento) {
+    public Atendimento get(@PathVariable Long id_atendimento, @AuthenticationPrincipal User user) {
         log.info("Buscando atendimento " + id_atendimento);
+        checkPermission(id_atendimento, user);
         return getAtendimento(id_atendimento);
     }
 
@@ -85,12 +96,14 @@ public class AtendimentoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar atendimento pelo id", tags = "atendimentos", summary = "Deletar atendimento")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void destroy(@PathVariable Long id_atendimento) {
+    public void destroy(@PathVariable Long id_atendimento, @AuthenticationPrincipal User user) {
         log.info("Apagando atendimento " + id_atendimento);
+        checkPermission(id_atendimento, user);
         repository.delete(getAtendimento(id_atendimento));
     }
 
@@ -98,14 +111,22 @@ public class AtendimentoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update atendimento pelo id", tags = "atendimentos", summary = "Update atendimento pelo id")
-    public Atendimento update(@PathVariable long id_atendimento, @RequestBody @Valid Atendimento atendimento) {
+    public Atendimento update(@PathVariable long id_atendimento, @RequestBody @Valid Atendimento atendimento, @AuthenticationPrincipal User user) {
         log.info("Atualizando atendimento " + id_atendimento + " " + atendimento);
-        getAtendimento(id_atendimento);
+        checkPermission(id_atendimento, user);
         atendimento.setId_atendimento(id_atendimento);
+        atendimento.setUser(user);
         return repository.save(atendimento);
+    }
+
+    private void checkPermission(Long id, User user) {
+        var atendimentoOld = getAtendimento(id);
+        if(!atendimentoOld.getUser().equals(user)) 
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     private Atendimento getAtendimento(Long id_atendimento) {

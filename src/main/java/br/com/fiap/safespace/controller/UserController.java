@@ -46,6 +46,7 @@ public class UserController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar users", tags = "users", summary = "Lista de users")
     public Page<User> index(@ParameterObject @ModelAttribute UserFilter filter,
@@ -59,10 +60,14 @@ public class UserController {
     @CacheEvict(value = "users", allEntries = true)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(responses = {
-            @ApiResponse(responseCode = "400", description = "Falha na validação")
+            @ApiResponse(responseCode = "400", description = "Falha na validação"),
+            @ApiResponse(responseCode = "403", description = "Permissão negada")
     }, description = "Cadastrar user", tags = "users", summary = "Cadastrar user")
     public User create(@RequestBody @Valid User user) {
         log.info("Cadastrando user " + user.getNome());
+        if (user.getRole() == UserRole.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não é permitido criar usuários com role ADMIN");
+        }
         return repository.save(user);
     }
 
@@ -70,6 +75,7 @@ public class UserController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar user pelo id", tags = "users", summary = "Listar user pelo id")
@@ -82,6 +88,7 @@ public class UserController {
     @Operation(responses = {
         @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar user pelo id", tags = "users", summary = "Deletar user")
@@ -95,6 +102,7 @@ public class UserController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update user pelo id", tags = "users", summary = "Update user pelo id")

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.safespace.model.Pedido;
 import br.com.fiap.safespace.model.Statustype;
+import br.com.fiap.safespace.model.User;
 import br.com.fiap.safespace.model.PedidoType;
 import br.com.fiap.safespace.repository.PedidoRepository;
 import br.com.fiap.safespace.specification.PedidoSpecification;
@@ -49,23 +51,26 @@ public class PedidoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar pedidos", tags = "pedidos", summary = "Lista de pedidos")
-    public Page<Pedido> index(@ParameterObject @ModelAttribute PedidoFilter filter,
+    public Page<Pedido> index(@AuthenticationPrincipal User user, @ParameterObject @ModelAttribute PedidoFilter filter,
         @ParameterObject @PageableDefault(size = 5, sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando pedidos");
         var specification = PedidoSpecification.withFilters(filter);
-        return repository.findAll(specification, pageable);
+        return repository.findByuser(user, specification, pageable);
     }
 
     @PostMapping
     @CacheEvict(value = "pedidos", allEntries = true)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(responses = {
-            @ApiResponse(responseCode = "400", description = "Falha na validação")
+            @ApiResponse(responseCode = "400", description = "Falha na validação"),
+            @ApiResponse(responseCode = "403", description = "Permissão negada")
     }, description = "Cadastrar pedido", tags = "pedidos", summary = "Cadastrar pedido")
-    public Pedido create(@RequestBody @Valid Pedido pedido) {
+    public Pedido create(@RequestBody @Valid Pedido pedido, @AuthenticationPrincipal User user) {
         log.info("Cadastrando pedido do" + pedido.getUser().getNome());
+        pedido.setUser(user);
         return repository.save(pedido);
     }
 
@@ -73,11 +78,13 @@ public class PedidoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar pedido pelo id", tags = "pedidos", summary = "Listar pedido pelo id")
-    public Pedido get(@PathVariable Long id_pedido) {
+    public Pedido get(@PathVariable Long id_pedido, @AuthenticationPrincipal User user) {
         log.info("Buscando pedido " + id_pedido);
+        checkPermission(id_pedido, user);
         return getPedido(id_pedido);
     }
 
@@ -85,12 +92,14 @@ public class PedidoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar pedido pelo id", tags = "pedidos", summary = "Deletar pedido")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void destroy(@PathVariable Long id_pedido) {
+    public void destroy(@PathVariable Long id_pedido, @AuthenticationPrincipal User user) {
         log.info("Apagando pedido " + id_pedido);
+        checkPermission(id_pedido, user);
         repository.delete(getPedido(id_pedido));
     }
 
@@ -98,14 +107,22 @@ public class PedidoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update pedido pelo id", tags = "pedidos", summary = "Update pedido pelo id")
-    public Pedido update(@PathVariable Long id_pedido, @RequestBody @Valid Pedido pedido) {
+    public Pedido update(@PathVariable Long id_pedido, @RequestBody @Valid Pedido pedido, @AuthenticationPrincipal User user) {
         log.info("Atualizando pedido " + id_pedido + " " + pedido);
-        getPedido(id_pedido);
+        checkPermission(id_pedido, user);
         pedido.setId_pedido(id_pedido);
+        pedido.setUser(user);
         return repository.save(pedido);
+    }
+
+    private void checkPermission(Long id, User user) {
+        var pedidoOld = getPedido(id);
+        if(!pedidoOld.getUser().equals(user)) 
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     private Pedido getPedido(Long id_pedido) {

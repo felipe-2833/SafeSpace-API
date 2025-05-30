@@ -43,6 +43,7 @@ public class FiliadoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos filtros ou parâmetros"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar filiados", tags = "filiados", summary = "Lista de filiados")
     public Page<Filiado> index(@ParameterObject @ModelAttribute VoluntarioFilter filter,
@@ -56,7 +57,8 @@ public class FiliadoController {
     @CacheEvict(value = "filiados", allEntries = true)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(responses = {
-            @ApiResponse(responseCode = "400", description = "Falha na validação")
+            @ApiResponse(responseCode = "400", description = "Falha na validação"),
+            @ApiResponse(responseCode = "403", description = "Permissão negada")
     }, description = "Cadastrar filiado", tags = "filiados", summary = "Cadastrar filiado")
     public Filiado create(@RequestBody @Valid Filiado filiado) {
         log.info("Cadastrando filiado do" + filiado.getNome());
@@ -67,6 +69,7 @@ public class FiliadoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro encontrado com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar filiado pelo id", tags = "filiados", summary = "Listar filiado pelo id")
@@ -79,6 +82,7 @@ public class FiliadoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "204", description = "Registro removido com sucesso"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar filiado pelo id", tags = "filiados", summary = "Deletar filiado")
@@ -92,6 +96,7 @@ public class FiliadoController {
     @Operation(responses = {
         @ApiResponse(responseCode = "200", description = "Registro atualizado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Falha na validação dos dados"),
+        @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update filiado pelo id", tags = "filiados", summary = "Update filiado pelo id")
