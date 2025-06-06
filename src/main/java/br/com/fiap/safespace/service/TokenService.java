@@ -16,8 +16,16 @@ import br.com.fiap.safespace.model.UserRole;
 @Service
 public class TokenService {
 
-    private final Long DURATION = 10L; // 10 minutes
-    private final Algorithm ALG = Algorithm.HMAC256("secret");
+    private final Long DURATION = 120L; // 10 minutes
+    private Algorithm ALG;
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @PostConstruct
+    public void init() {
+        ALG = Algorithm.HMAC256(secret);
+    }
 
     public Token createToken(User user){
         var token = JWT.create()
