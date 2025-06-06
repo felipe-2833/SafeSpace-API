@@ -3,6 +3,7 @@ package br.com.fiap.safespace.service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
@@ -11,6 +12,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import br.com.fiap.safespace.model.Token;
 import br.com.fiap.safespace.model.User;
 import br.com.fiap.safespace.model.UserRole;
+import jakarta.annotation.PostConstruct;
 
 
 @Service
