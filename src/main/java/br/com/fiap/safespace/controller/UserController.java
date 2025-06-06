@@ -65,9 +65,6 @@ public class UserController {
     }, description = "Cadastrar user", tags = "users", summary = "Cadastrar user")
     public User create(@RequestBody @Valid User user) {
         log.info("Cadastrando user " + user.getNome());
-        if (user.getRole() == UserRole.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não é permitido criar usuários com role ADMIN");
-        }
         return repository.save(user);
     }
 

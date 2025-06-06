@@ -10,7 +10,5 @@ import br.com.fiap.safespace.model.Atendimento;
 import br.com.fiap.safespace.model.User;
 
 public interface AtendimentoRepository extends JpaRepository<Atendimento, Long>, JpaSpecificationExecutor<Atendimento>{
-
-    Page<Atendimento> findByUser(User user, Specification<Atendimento> specification, Pageable pageable);
     
 }

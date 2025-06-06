@@ -50,11 +50,11 @@ public class OngController {
         @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar ongs", tags = "ongs", summary = "Lista de ongs")
-    public Page<Ong> index(@AuthenticationPrincipal User user, @ParameterObject @ModelAttribute OngFilter filter,
+    public Page<Ong> index(@ParameterObject @ModelAttribute OngFilter filter,
         @ParameterObject @PageableDefault(size = 5, sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando ongs");
         var specification = OngSpecification.withFilters(filter);
-        return repository.findByUser(user, specification, pageable);
+        return repository.findAll(specification, pageable);
     }
 
     @PostMapping
@@ -64,9 +64,8 @@ public class OngController {
             @ApiResponse(responseCode = "400", description = "Falha na validação"),
             @ApiResponse(responseCode = "403", description = "Permissão negada")
     }, description = "Cadastrar ong", tags = "ongs", summary = "Cadastrar ong")
-    public Ong create(@RequestBody @Valid Ong ong, @AuthenticationPrincipal User user) {
+    public Ong create(@RequestBody @Valid Ong ong) {
         log.info("Cadastrando ong do" + ong.getNome());
-        ong.setUser(user);
         return repository.save(ong);
     }
 
@@ -78,9 +77,8 @@ public class OngController {
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar ong pelo id", tags = "ongs", summary = "Listar ong pelo id")
-    public Ong get(@PathVariable Long id_ong, @AuthenticationPrincipal User user) {
+    public Ong get(@PathVariable Long id_ong) {
         log.info("Buscando ong " + id_ong);
-        checkPermission(id_ong, user);
         return getOng(id_ong);
     }
 
@@ -93,9 +91,8 @@ public class OngController {
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Deletar ong pelo id", tags = "ongs", summary = "Deletar ong")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void destroy(@PathVariable Long id_ong, @AuthenticationPrincipal User user) {
+    public void destroy(@PathVariable Long id_ong) {
         log.info("Apagando ong " + id_ong);
-        checkPermission(id_ong, user);
         repository.delete(getOng(id_ong));
     }
 
@@ -107,18 +104,11 @@ public class OngController {
         @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Update ong pelo id", tags = "ongs", summary = "Update ong pelo id")
-    public Ong update(@PathVariable Long id_ong, @RequestBody @Valid Ong ong, @AuthenticationPrincipal User user) {
+    public Ong update(@PathVariable Long id_ong, @RequestBody @Valid Ong ong) {
         log.info("Atualizando ong " + id_ong + " " + ong);
-        checkPermission(id_ong, user);
+        getOng(id_ong);
         ong.setId_ong(id_ong);
-        ong.setUser(user);
         return repository.save(ong);
-    }
-
-    private void checkPermission(Long id, User user) {
-        var ongOld = getOng(id);
-        if(!ongOld.getUser().equals(user)) 
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     private Ong getOng(Long id_ong) {

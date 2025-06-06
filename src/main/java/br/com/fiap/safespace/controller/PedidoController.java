@@ -57,8 +57,10 @@ public class PedidoController {
     public Page<Pedido> index(@AuthenticationPrincipal User user, @ParameterObject @ModelAttribute PedidoFilter filter,
         @ParameterObject @PageableDefault(size = 5, sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando pedidos");
-        var specification = PedidoSpecification.withFilters(filter);
-        return repository.findByuser(user, specification, pageable);
+        var filterSpecification = PedidoSpecification.withFilters(filter);
+        var userSpecification = PedidoSpecification.byUser(user);
+        var combinedSpecification = filterSpecification.and(userSpecification);
+        return repository.findAll(combinedSpecification, pageable);
     }
 
     @PostMapping

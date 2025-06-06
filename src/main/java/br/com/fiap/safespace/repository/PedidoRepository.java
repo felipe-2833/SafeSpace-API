@@ -10,7 +10,5 @@ import br.com.fiap.safespace.model.Pedido;
 import br.com.fiap.safespace.model.User;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Long>, JpaSpecificationExecutor<Pedido>{
-
-    Page<Pedido> findByuser(User user, Specification<Pedido> specification, Pageable pageable);
     
 }

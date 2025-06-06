@@ -3,6 +3,7 @@ package br.com.fiap.safespace.specification;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.fiap.safespace.model.User;
 import org.springframework.data.jpa.domain.Specification;
 
 import br.com.fiap.safespace.controller.PedidoController.PedidoFilter;
@@ -37,5 +38,9 @@ public class PedidoSpecification {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    public static Specification<Pedido> byUser(User user) {
+        return (root, query, cb) -> cb.equal(root.get("user"), user);
     }
 }

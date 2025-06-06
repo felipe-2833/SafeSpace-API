@@ -55,11 +55,13 @@ public class AtendimentoController {
         @ApiResponse(responseCode = "403", description = "Permissão negada"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     },description = "Listar atendimentos", tags = "atendimentos", summary = "Lista de atendimentos")
-    public Page<Atendimento> index(@AuthenticationPrincipal User user, @ParameterObject @ModelAttribute AtendimentoFilter filter,
+    public Page<Atendimento> index(@AuthenticationPrincipal User principalUser, @ParameterObject @ModelAttribute AtendimentoFilter filter,
         @ParameterObject @PageableDefault(size = 5, sort = "user.nome", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Buscando atendimentos");
-        var specification = AtendimentoSpecification.withFilters(filter);
-        return repository.findByUser(user ,specification, pageable);
+        var filterSpecification = AtendimentoSpecification.withFilters(filter);
+        var userSpecification = AtendimentoSpecification.byPrincipal(principalUser);
+        var combinedSpecification = filterSpecification.and(userSpecification);
+        return repository.findAll(combinedSpecification, pageable);
     }
 
     @PostMapping
@@ -71,9 +73,6 @@ public class AtendimentoController {
     }, description = "Cadastrar atendimento", tags = "atendimentos", summary = "Cadastrar atendimento")
     public Atendimento create(@RequestBody @Valid Atendimento atendimento, @AuthenticationPrincipal User user) {
         log.info("Cadastrando atendimento do" + atendimento.getUser().getNome());
-        if (atendimento.getUser().getRole() != UserRole.USER || atendimento.getUser().getRole() != UserRole.VITIMA) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não é permitido fazer atendimentos em usuarios que não sejam padrões ou vitimas");
-        }
         atendimento.setUser(user);
         return repository.save(atendimento);
     }
@@ -123,10 +122,27 @@ public class AtendimentoController {
         return repository.save(atendimento);
     }
 
-    private void checkPermission(Long id, User user) {
+    private void checkPermission(Long id, User principalUser) {
         var atendimentoOld = getAtendimento(id);
-        if(!atendimentoOld.getUser().equals(user)) 
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        // Debug para ver os IDs
+        System.out.println("Principal User ID: " + principalUser.getId_user() + " Email: " + principalUser.getEmail());
+        if (atendimentoOld.getUser() != null) {
+            System.out.println("Atendimento Old User ID: " + atendimentoOld.getUser().getId_user() + " Email: " + atendimentoOld.getUser().getEmail());
+        }
+        if (atendimentoOld.getPsicologo() != null) {
+            System.out.println("Atendimento Old Psicologo ID: " + atendimentoOld.getPsicologo().getId_user() + " Email: " + atendimentoOld.getPsicologo().getEmail());
+        }
+
+        boolean isUser = atendimentoOld.getUser() != null &&
+                atendimentoOld.getUser().getId_user().equals(principalUser.getId_user());
+
+        boolean isPsicologo = atendimentoOld.getPsicologo() != null &&
+                atendimentoOld.getPsicologo().getId_user().equals(principalUser.getId_user());
+
+        if (!(isUser || isPsicologo)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar este atendimento.");
+        }
     }
 
     private Atendimento getAtendimento(Long id_atendimento) {
