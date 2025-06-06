@@ -104,7 +104,22 @@
 			<artifactId>ojdbc11</artifactId> <scope>runtime</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ucp</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>oracle-maven-repository</id>
+			<name>Oracle Maven Repository</name>
+			<url>https://maven.oracle.com</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
