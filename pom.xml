@@ -99,30 +99,7 @@
 			<version>4.5.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.oracle.database.jdbc</groupId>
-			<artifactId>ojdbc11</artifactId>
-			<version>23.4.0.24.05</version>
-			<scope>runtime</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.oracle.database.jdbc</groupId>
-			<artifactId>ucp</artifactId>
-			<version>23.4.0.24.05</version>
-			<scope>runtime</scope>
-		</dependency>
-
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>oracle-maven-repository</id>
-			<name>Oracle Maven Repository</name>
-			<url>https://maven.oracle.com</url>
-			<layout>default</layout>
-		</repository>
-	</repositories>
 
 	<build>
 		<plugins>
