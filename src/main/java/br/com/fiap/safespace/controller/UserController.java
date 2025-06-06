@@ -51,7 +51,7 @@ public class UserController {
     },description = "Listar users", tags = "users", summary = "Lista de users")
     public Page<User> index(@ParameterObject @ModelAttribute UserFilter filter,
         @ParameterObject @PageableDefault(size = 5, sort = "nome", direction = Sort.Direction.DESC) Pageable pageable) {
-        log.info("Buscando userss com filtro", filter.nome(), filter.endereco(), filter.role());
+        log.info("Buscando users com filtro", filter.nome(), filter.endereco(), filter.role());
         var specification = UserSpecification.withFilters(filter);
         return repository.findAll(specification, pageable);
     }

@@ -71,9 +71,8 @@ public class AtendimentoController {
             @ApiResponse(responseCode = "400", description = "Falha na validação"),
             @ApiResponse(responseCode = "403", description = "Permissão negada")
     }, description = "Cadastrar atendimento", tags = "atendimentos", summary = "Cadastrar atendimento")
-    public Atendimento create(@RequestBody @Valid Atendimento atendimento, @AuthenticationPrincipal User user) {
+    public Atendimento create(@RequestBody @Valid Atendimento atendimento) {
         log.info("Cadastrando atendimento do" + atendimento.getUser().getNome());
-        atendimento.setUser(user);
         return repository.save(atendimento);
     }
 
@@ -124,15 +123,6 @@ public class AtendimentoController {
 
     private void checkPermission(Long id, User principalUser) {
         var atendimentoOld = getAtendimento(id);
-
-        // Debug para ver os IDs
-        System.out.println("Principal User ID: " + principalUser.getId_user() + " Email: " + principalUser.getEmail());
-        if (atendimentoOld.getUser() != null) {
-            System.out.println("Atendimento Old User ID: " + atendimentoOld.getUser().getId_user() + " Email: " + atendimentoOld.getUser().getEmail());
-        }
-        if (atendimentoOld.getPsicologo() != null) {
-            System.out.println("Atendimento Old Psicologo ID: " + atendimentoOld.getPsicologo().getId_user() + " Email: " + atendimentoOld.getPsicologo().getEmail());
-        }
 
         boolean isUser = atendimentoOld.getUser() != null &&
                 atendimentoOld.getUser().getId_user().equals(principalUser.getId_user());
