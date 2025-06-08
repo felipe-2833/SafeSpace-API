@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -37,6 +38,8 @@ public class FiliadoController {
 
     @Autowired
     private FiliadoRepository repository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping
     @Cacheable("filiados")
@@ -62,6 +65,7 @@ public class FiliadoController {
     }, description = "Cadastrar filiado", tags = "filiados", summary = "Cadastrar filiado")
     public Filiado create(@RequestBody @Valid Filiado filiado) {
         log.info("Cadastrando filiado do" + filiado.getNome());
+        filiado.setPassword(passwordEncoder.encode(filiado.getPassword()));
         return repository.save(filiado);
     }
 

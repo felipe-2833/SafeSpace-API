@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/psicologos")
 @Slf4j
 public class PsicologoController {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public record PsicologoFilter(String nome, String endereco, String crp, String area_atuacao) {
     }
@@ -64,6 +68,7 @@ public class PsicologoController {
     }, description = "Cadastrar psicologo", tags = "psicologos", summary = "Cadastrar psicologo")
     public Psicologo create(@RequestBody @Valid Psicologo psicologo) {
         log.info("Cadastrando psicologo " + psicologo.getNome());
+        psicologo.setPassword(passwordEncoder.encode(psicologo.getPassword()));
         return repository.save(psicologo);
     }
 

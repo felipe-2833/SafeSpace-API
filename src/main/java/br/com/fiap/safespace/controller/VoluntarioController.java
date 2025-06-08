@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,6 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/voluntarios")
 @Slf4j
 public class VoluntarioController {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public record VoluntarioFilter(String nome, String endereco, String disponibilidade, String area_atuacao) {
     }
@@ -65,6 +69,7 @@ public class VoluntarioController {
     }, description = "Cadastrar voluntario", tags = "voluntarios", summary = "Cadastrar voluntario")
     public Voluntario create(@RequestBody @Valid Voluntario voluntario) {
         log.info("Cadastrando voluntario " + voluntario.getNome());
+        voluntario.setPassword(passwordEncoder.encode(voluntario.getPassword()));
         return repository.save(voluntario);
     }
 
