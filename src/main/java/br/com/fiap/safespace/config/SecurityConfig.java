@@ -27,13 +27,13 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/atendimentos").hasAuthority("PSICOLOGO")
+                .requestMatchers(HttpMethod.POST, "/atendimentos/**").hasAuthority("PSICOLOGO")
                 .requestMatchers(HttpMethod.PUT, "/atendimentos/**").hasAuthority("PSICOLOGO")
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/login/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/users/**").permitAll()
                 .anyRequest().authenticated())
         .csrf(csrf -> csrf.disable())
         .cors(Customizer.withDefaults())
