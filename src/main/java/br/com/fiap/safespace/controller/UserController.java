@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,6 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public record UserFilter(String nome, String endereco, UserRole role) {
     }
@@ -65,6 +69,7 @@ public class UserController {
     }, description = "Cadastrar user", tags = "users", summary = "Cadastrar user")
     public User create(@RequestBody @Valid User user) {
         log.info("Cadastrando user " + user.getNome());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return repository.save(user);
     }
 
